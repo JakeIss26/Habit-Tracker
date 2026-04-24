@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: habit-tracker-api
+
+  profiles:
+    active: local
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: false

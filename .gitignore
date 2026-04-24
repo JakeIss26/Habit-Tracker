@@ -41,3 +41,6 @@ Thumbs.db
 *.tmp
 *.swp
 *.swo
+
+# secrets
+src/main/resources/application-local.yml
