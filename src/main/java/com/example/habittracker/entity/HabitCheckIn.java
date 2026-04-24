@@ -5,24 +5,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "habits")
-public class Habit {
+@Table(name = "habit_check_ins")
+public class HabitCheckIn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    private Long habitId;
 
-    private String description;
-
-    private boolean archived = false;
+    private LocalDate checkInDate;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 }
