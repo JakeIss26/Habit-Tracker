@@ -3,6 +3,7 @@ package com.example.habittracker.controller;
 import com.example.habittracker.dto.request.HabitCreateRequest;
 import com.example.habittracker.dto.request.HabitUpdateRequest;
 import com.example.habittracker.dto.response.HabitResponse;
+import com.example.habittracker.dto.response.HabitStatsResponse;
 import com.example.habittracker.service.HabitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,5 +43,10 @@ public class HabitController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void archiveHabit(@PathVariable Long id) {
         habitService.archiveHabit(id);
+    }
+
+    @GetMapping("/{id}/stats")
+    public HabitStatsResponse getHabitStats(@PathVariable Long id) {
+        return habitService.getHabitStats(id);
     }
 }

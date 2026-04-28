@@ -3,7 +3,9 @@ package com.example.habittracker.service;
 import com.example.habittracker.dto.request.HabitCreateRequest;
 import com.example.habittracker.dto.request.HabitUpdateRequest;
 import com.example.habittracker.dto.response.HabitResponse;
+import com.example.habittracker.dto.response.HabitStatsResponse;
 import com.example.habittracker.entity.Habit;
+import com.example.habittracker.repository.HabitCheckInRepository;
 import com.example.habittracker.repository.HabitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.List;
 public class HabitService {
 
     private final HabitRepository habitRepository;
+    private final HabitCheckInRepository habitCheckInRepository;
 
     public HabitResponse createHabit(HabitCreateRequest request) {
         Habit habit = new Habit();
@@ -60,6 +63,16 @@ public class HabitService {
         habit.setArchived(true);
 
         habitRepository.save(habit);
+    }
+
+    public HabitStatsResponse getHabitStats(Long habitId) {
+        if (!habitRepository.existsById(habitId)) {
+            throw new RuntimeException("Habit not found");
+        }
+
+        long totalCheckIns = habitCheckInRepository.countByHabitId(habitId);
+
+        return new HabitStatsResponse(habitId, totalCheckIns);
     }
 
     private HabitResponse toResponse(Habit habit) {
