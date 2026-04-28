@@ -1,6 +1,7 @@
 package com.example.habittracker.controller;
 
 import com.example.habittracker.dto.request.HabitCreateRequest;
+import com.example.habittracker.dto.request.HabitUpdateRequest;
 import com.example.habittracker.dto.response.HabitResponse;
 import com.example.habittracker.service.HabitService;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,21 @@ public class HabitController {
     @GetMapping
     public List<HabitResponse> getActiveHabits() {
         return habitService.getActiveHabits();
+    }
+
+    @GetMapping("/{id}")
+    public HabitResponse getHabitById(@PathVariable Long id) {
+        return habitService.getHabitById(id);
+    }
+
+    @PatchMapping("/{id}")
+    public HabitResponse updateHabit(@PathVariable Long id, @RequestBody HabitUpdateRequest request) {
+        return habitService.updateHabit(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void archiveHabit(@PathVariable Long id) {
+        habitService.archiveHabit(id);
     }
 }

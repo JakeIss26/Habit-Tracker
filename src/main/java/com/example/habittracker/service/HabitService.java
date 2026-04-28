@@ -1,6 +1,7 @@
 package com.example.habittracker.service;
 
 import com.example.habittracker.dto.request.HabitCreateRequest;
+import com.example.habittracker.dto.request.HabitUpdateRequest;
 import com.example.habittracker.dto.response.HabitResponse;
 import com.example.habittracker.entity.Habit;
 import com.example.habittracker.repository.HabitRepository;
@@ -31,6 +32,34 @@ public class HabitService {
         .stream()
         .map(this::toResponse)
         .toList();
+    }
+
+    public HabitResponse getHabitById(Long id) {
+        Habit habit = habitRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Habit not found"));
+
+        return toResponse(habit);
+    }
+
+    public HabitResponse updateHabit(Long id, HabitUpdateRequest request) {
+        Habit habit = habitRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Habit not found"));
+
+        habit.setTitle(request.getTitle());
+        habit.setDescription(request.getDescription());
+
+        Habit updatedHabit = habitRepository.save(habit);
+
+        return toResponse(updatedHabit);
+    }
+
+    public void archiveHabit(Long id) {
+        Habit habit = habitRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Habit not found"));
+
+        habit.setArchived(true);
+
+        habitRepository.save(habit);
     }
 
     private HabitResponse toResponse(Habit habit) {
