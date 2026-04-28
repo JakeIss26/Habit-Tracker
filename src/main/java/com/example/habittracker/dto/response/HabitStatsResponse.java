@@ -10,4 +10,6 @@ public class HabitStatsResponse {
     private Long habitId;
 
     private long totalCheckIns;
+
+    private int currentStreak;
 }

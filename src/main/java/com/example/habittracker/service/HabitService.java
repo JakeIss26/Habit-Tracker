@@ -5,11 +5,13 @@ import com.example.habittracker.dto.request.HabitUpdateRequest;
 import com.example.habittracker.dto.response.HabitResponse;
 import com.example.habittracker.dto.response.HabitStatsResponse;
 import com.example.habittracker.entity.Habit;
+import com.example.habittracker.entity.HabitCheckIn;
 import com.example.habittracker.repository.HabitCheckInRepository;
 import com.example.habittracker.repository.HabitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -72,7 +74,27 @@ public class HabitService {
 
         long totalCheckIns = habitCheckInRepository.countByHabitId(habitId);
 
-        return new HabitStatsResponse(habitId, totalCheckIns);
+        int currentStreak = calculateCurrentStreak(habitId);
+
+        return new HabitStatsResponse(habitId, totalCheckIns, currentStreak);
+    }
+
+    private int calculateCurrentStreak(Long habitId) {
+        List<HabitCheckIn> checkIns = habitCheckInRepository.findByHabitIdOrderByCheckInDateDesc(habitId);
+
+        int streak = 0;
+        LocalDate expectedDate = LocalDate.now();
+
+        for (HabitCheckIn checkIn : checkIns) {
+            if (checkIn.getCheckInDate().equals(expectedDate)) {
+                streak++;
+                expectedDate = expectedDate.minusDays(1);
+            } else if (checkIn.getCheckInDate().isBefore(expectedDate)) {
+                break;
+            }
+        }
+
+        return streak;
     }
 
     private HabitResponse toResponse(Habit habit) {

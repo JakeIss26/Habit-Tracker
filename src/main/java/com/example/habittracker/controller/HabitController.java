@@ -5,6 +5,7 @@ import com.example.habittracker.dto.request.HabitUpdateRequest;
 import com.example.habittracker.dto.response.HabitResponse;
 import com.example.habittracker.dto.response.HabitStatsResponse;
 import com.example.habittracker.service.HabitService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class HabitController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public HabitResponse createHabit(@RequestBody HabitCreateRequest request) {
+    public HabitResponse createHabit(@Valid @RequestBody HabitCreateRequest request) {
         return habitService.createHabit(request);
     }
 
@@ -35,7 +36,7 @@ public class HabitController {
     }
 
     @PatchMapping("/{id}")
-    public HabitResponse updateHabit(@PathVariable Long id, @RequestBody HabitUpdateRequest request) {
+    public HabitResponse updateHabit(@PathVariable Long id, @Valid @RequestBody HabitUpdateRequest request) {
         return habitService.updateHabit(id, request);
     }
 
