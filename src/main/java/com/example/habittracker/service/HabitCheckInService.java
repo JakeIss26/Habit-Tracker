@@ -50,6 +50,16 @@ public class HabitCheckInService {
         .map(this::toResponse)
         .toList();
     }
+    public void deleteCheckIn(Long habitId, Long checkInId) {
+        HabitCheckIn checkIn = habitCheckInRepository.findById(checkInId)
+        .orElseThrow(() -> new RuntimeException("Check-in not found"));
+
+        if (!checkIn.getHabitId().equals(habitId)) {
+            throw new RuntimeException("Check-in does not belong to this habit");
+        }
+
+        habitCheckInRepository.delete(checkIn);
+    }
 
     private HabitCheckInResponse toResponse(HabitCheckIn checkIn) {
         return new HabitCheckInResponse(

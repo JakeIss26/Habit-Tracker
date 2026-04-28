@@ -25,4 +25,13 @@ public class HabitCheckInController {
     public List<HabitCheckInResponse> getCheckIns(@PathVariable Long habitId) {
         return habitCheckInService.getCheckInsByHabitId(habitId);
     }
+
+    @DeleteMapping("/{checkInId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCheckIn(
+    @PathVariable Long habitId,
+    @PathVariable Long checkInId
+    ) {
+        habitCheckInService.deleteCheckIn(habitId, checkInId);
+    }
 }
