@@ -14,4 +14,8 @@ public class HabitStatsResponse {
     private int currentStreak;
 
     private int longestStreak;
+
+    private long completedDaysLast7Days;
+
+    private double completionRateLast7Days;
 }

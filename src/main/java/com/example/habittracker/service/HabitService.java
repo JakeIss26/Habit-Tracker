@@ -78,11 +78,24 @@ public class HabitService {
 
         int longestStreak = calculateLongestStreak(habitId);
 
+        LocalDate today = LocalDate.now();
+        LocalDate sevenDaysAgo = today.minusDays(6);
+
+        long completedDaysLast7Days = habitCheckInRepository.countByHabitIdAndCheckInDateBetween(
+        habitId,
+        sevenDaysAgo,
+        today
+        );
+
+        double completionRateLast7Days = completedDaysLast7Days * 100.0 / 7;
+
         return new HabitStatsResponse(
         habitId,
         totalCheckIns,
         currentStreak,
-        longestStreak
+        longestStreak,
+        completedDaysLast7Days,
+        completionRateLast7Days
         );
     }
 

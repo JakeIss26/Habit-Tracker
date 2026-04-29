@@ -17,4 +17,6 @@ public interface HabitCheckInRepository extends JpaRepository<HabitCheckIn, Long
 
     long countByHabitId(Long habitId);
 
+    long countByHabitIdAndCheckInDateBetween(Long habitId, LocalDate startDate, LocalDate endDate);
+
 }
