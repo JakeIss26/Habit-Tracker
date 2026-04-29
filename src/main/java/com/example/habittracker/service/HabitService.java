@@ -88,6 +88,7 @@ public class HabitService {
         );
 
         double completionRateLast7Days = completedDaysLast7Days * 100.0 / 7;
+        completionRateLast7Days = roundToTwoDecimals(completionRateLast7Days);
 
         return new HabitStatsResponse(
         habitId,
@@ -147,6 +148,10 @@ public class HabitService {
         }
 
         return longestStreak;
+    }
+
+    private double roundToTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 
     private HabitResponse toResponse(Habit habit) {

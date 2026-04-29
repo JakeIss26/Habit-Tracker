@@ -35,7 +35,7 @@ public class HabitController {
         return habitService.getHabitById(id);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public HabitResponse updateHabit(@PathVariable Long id, @Valid @RequestBody HabitUpdateRequest request) {
         return habitService.updateHabit(id, request);
     }

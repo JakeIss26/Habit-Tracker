@@ -45,7 +45,7 @@ public class HabitCheckInService {
             throw new RuntimeException("Habit not found");
         }
 
-        return habitCheckInRepository.findByHabitId(habitId)
+        return habitCheckInRepository.findByHabitIdOrderByCheckInDateDesc(habitId)
         .stream()
         .map(this::toResponse)
         .toList();
