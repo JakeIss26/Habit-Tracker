@@ -12,4 +12,6 @@ public class HabitStatsResponse {
     private long totalCheckIns;
 
     private int currentStreak;
+
+    private int longestStreak;
 }

@@ -76,7 +76,14 @@ public class HabitService {
 
         int currentStreak = calculateCurrentStreak(habitId);
 
-        return new HabitStatsResponse(habitId, totalCheckIns, currentStreak);
+        int longestStreak = calculateLongestStreak(habitId);
+
+        return new HabitStatsResponse(
+        habitId,
+        totalCheckIns,
+        currentStreak,
+        longestStreak
+        );
     }
 
     private int calculateCurrentStreak(Long habitId) {
@@ -95,6 +102,38 @@ public class HabitService {
         }
 
         return streak;
+    }
+
+    private int calculateLongestStreak(Long habitId) {
+        List<HabitCheckIn> checkIns =
+        habitCheckInRepository.findByHabitIdOrderByCheckInDateAsc(habitId);
+
+        if (checkIns.isEmpty()) {
+            return 0;
+        }
+
+        int longestStreak = 1;
+        int currentStreak = 1;
+
+        LocalDate previousDate = checkIns.get(0).getCheckInDate();
+
+        for (int i = 1; i < checkIns.size(); i++) {
+            LocalDate currentDate = checkIns.get(i).getCheckInDate();
+
+            if (currentDate.equals(previousDate.plusDays(1))) {
+                currentStreak++;
+            } else {
+                currentStreak = 1;
+            }
+
+            if (currentStreak > longestStreak) {
+                longestStreak = currentStreak;
+            }
+
+            previousDate = currentDate;
+        }
+
+        return longestStreak;
     }
 
     private HabitResponse toResponse(Habit habit) {

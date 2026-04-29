@@ -11,6 +11,7 @@ public interface HabitCheckInRepository extends JpaRepository<HabitCheckIn, Long
     List<HabitCheckIn> findByHabitId(Long habitId);
 
     List<HabitCheckIn> findByHabitIdOrderByCheckInDateDesc(Long habitId);
+    List<HabitCheckIn> findByHabitIdOrderByCheckInDateAsc(Long habitId);
 
     boolean existsByHabitIdAndCheckInDate(Long habitId, LocalDate checkInDate);
 
