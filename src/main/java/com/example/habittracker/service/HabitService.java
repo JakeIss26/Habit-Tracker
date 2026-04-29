@@ -6,6 +6,7 @@ import com.example.habittracker.dto.response.HabitResponse;
 import com.example.habittracker.dto.response.HabitStatsResponse;
 import com.example.habittracker.entity.Habit;
 import com.example.habittracker.entity.HabitCheckIn;
+import com.example.habittracker.exception.HabitNotFoundException;
 import com.example.habittracker.repository.HabitCheckInRepository;
 import com.example.habittracker.repository.HabitRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,14 +42,14 @@ public class HabitService {
 
     public HabitResponse getHabitById(Long id) {
         Habit habit = habitRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Habit not found"));
+        .orElseThrow(() -> new HabitNotFoundException(id));
 
         return toResponse(habit);
     }
 
     public HabitResponse updateHabit(Long id, HabitUpdateRequest request) {
         Habit habit = habitRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Habit not found"));
+        .orElseThrow(() -> new HabitNotFoundException(id));
 
         habit.setTitle(request.getTitle());
         habit.setDescription(request.getDescription());
@@ -60,7 +61,7 @@ public class HabitService {
 
     public void archiveHabit(Long id) {
         Habit habit = habitRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Habit not found"));
+        .orElseThrow(() -> new HabitNotFoundException(id));
 
         habit.setArchived(true);
 
@@ -69,7 +70,7 @@ public class HabitService {
 
     public HabitStatsResponse getHabitStats(Long habitId) {
         if (!habitRepository.existsById(habitId)) {
-            throw new RuntimeException("Habit not found");
+            throw new HabitNotFoundException(habitId);
         }
 
         long totalCheckIns = habitCheckInRepository.countByHabitId(habitId);

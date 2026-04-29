@@ -2,6 +2,10 @@ package com.example.habittracker.service;
 
 import com.example.habittracker.dto.response.HabitCheckInResponse;
 import com.example.habittracker.entity.HabitCheckIn;
+import com.example.habittracker.exception.CheckInNotFoundException;
+import com.example.habittracker.exception.CheckInOwnershipException;
+import com.example.habittracker.exception.HabitAlreadyCheckedInException;
+import com.example.habittracker.exception.HabitNotFoundException;
 import com.example.habittracker.repository.HabitCheckInRepository;
 import com.example.habittracker.repository.HabitRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +23,7 @@ public class HabitCheckInService {
 
     public HabitCheckInResponse createCheckIn(Long habitId) {
         if (!habitRepository.existsById(habitId)) {
-            throw new RuntimeException("Habit not found");
+            throw new HabitNotFoundException(habitId);
         }
 
         LocalDate today = LocalDate.now();
@@ -27,7 +31,7 @@ public class HabitCheckInService {
         boolean alreadyCheckedIn = habitCheckInRepository.existsByHabitIdAndCheckInDate(habitId, today);
 
         if (alreadyCheckedIn) {
-            throw new RuntimeException("Habit already checked in today");
+            throw new HabitAlreadyCheckedInException(habitId);
         }
 
         HabitCheckIn checkIn = new HabitCheckIn();
@@ -42,7 +46,7 @@ public class HabitCheckInService {
 
     public List<HabitCheckInResponse> getCheckInsByHabitId(Long habitId) {
         if (!habitRepository.existsById(habitId)) {
-            throw new RuntimeException("Habit not found");
+            throw new HabitNotFoundException(habitId);
         }
 
         return habitCheckInRepository.findByHabitIdOrderByCheckInDateDesc(habitId)
@@ -52,10 +56,10 @@ public class HabitCheckInService {
     }
     public void deleteCheckIn(Long habitId, Long checkInId) {
         HabitCheckIn checkIn = habitCheckInRepository.findById(checkInId)
-        .orElseThrow(() -> new RuntimeException("Check-in not found"));
+        .orElseThrow(() -> new CheckInNotFoundException(checkInId));
 
         if (!checkIn.getHabitId().equals(habitId)) {
-            throw new RuntimeException("Check-in does not belong to this habit");
+            throw new CheckInOwnershipException(checkInId, habitId);
         }
 
         habitCheckInRepository.delete(checkIn);
