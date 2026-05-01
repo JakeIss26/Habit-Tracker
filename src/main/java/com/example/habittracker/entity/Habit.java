@@ -24,5 +24,8 @@ public class Habit {
 
     private boolean archived = false;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 }

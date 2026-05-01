@@ -21,12 +21,16 @@ public class HabitService {
 
     private final HabitRepository habitRepository;
     private final HabitCheckInRepository habitCheckInRepository;
+    private final UserService currentUserService;
 
     public HabitResponse createHabit(HabitCreateRequest request) {
+        Long currentUserId = currentUserService.getCurrentUserId();
+
         Habit habit = new Habit();
 
         habit.setTitle(request.getTitle());
         habit.setDescription(request.getDescription());
+        habit.setUserId(currentUserId);
 
         Habit savedHabit = habitRepository.save(habit);
 
@@ -34,21 +38,27 @@ public class HabitService {
     }
 
     public List<HabitResponse> getActiveHabits() {
-        return habitRepository.findByArchivedFalseOrderByCreatedAtDesc()
+        Long currentUserId = currentUserService.getCurrentUserId();
+
+        return habitRepository.findByUserIdAndArchivedFalseOrderByCreatedAtDesc(currentUserId)
         .stream()
         .map(this::toResponse)
         .toList();
     }
 
     public HabitResponse getHabitById(Long id) {
-        Habit habit = habitRepository.findById(id)
+        Long currentUserId = currentUserService.getCurrentUserId();
+
+        Habit habit = habitRepository.findByIdAndUserId(id, currentUserId)
         .orElseThrow(() -> new HabitNotFoundException(id));
 
         return toResponse(habit);
     }
 
     public HabitResponse updateHabit(Long id, HabitUpdateRequest request) {
-        Habit habit = habitRepository.findById(id)
+        Long currentUserId = currentUserService.getCurrentUserId();
+
+        Habit habit = habitRepository.findByIdAndUserId(id, currentUserId)
         .orElseThrow(() -> new HabitNotFoundException(id));
 
         habit.setTitle(request.getTitle());
@@ -60,7 +70,9 @@ public class HabitService {
     }
 
     public void archiveHabit(Long id) {
-        Habit habit = habitRepository.findById(id)
+        Long currentUserId = currentUserService.getCurrentUserId();
+
+        Habit habit = habitRepository.findByIdAndUserId(id, currentUserId)
         .orElseThrow(() -> new HabitNotFoundException(id));
 
         habit.setArchived(true);
@@ -69,9 +81,11 @@ public class HabitService {
     }
 
     public HabitStatsResponse getHabitStats(Long habitId) {
-        if (!habitRepository.existsById(habitId)) {
-            throw new HabitNotFoundException(habitId);
-        }
+        Long currentUserId = currentUserService.getCurrentUserId();
+
+        habitRepository.findByIdAndUserId(habitId, currentUserId)
+        .orElseThrow(() -> new HabitNotFoundException(habitId));
+
 
         long totalCheckIns = habitCheckInRepository.countByHabitId(habitId);
 
@@ -92,12 +106,12 @@ public class HabitService {
         completionRateLast7Days = roundToTwoDecimals(completionRateLast7Days);
 
         return new HabitStatsResponse(
-        habitId,
-        totalCheckIns,
-        currentStreak,
-        longestStreak,
-        completedDaysLast7Days,
-        completionRateLast7Days
+            habitId,
+            totalCheckIns,
+            currentStreak,
+            longestStreak,
+            completedDaysLast7Days,
+            completionRateLast7Days
         );
     }
 
