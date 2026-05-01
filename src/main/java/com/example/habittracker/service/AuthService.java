@@ -15,6 +15,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -33,10 +34,13 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
+        String token = jwtService.generateToken(savedUser);
+
         return new AuthResponse(
-        savedUser.getId(),
-        savedUser.getUsername(),
-        savedUser.getEmail()
+            savedUser.getId(),
+            savedUser.getUsername(),
+            savedUser.getEmail(),
+            token
         );
     }
 
@@ -53,10 +57,13 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
+        String token = jwtService.generateToken(user);
+
         return new AuthResponse(
-        user.getId(),
-        user.getUsername(),
-        user.getEmail()
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            token
         );
     }
 }
