@@ -1,5 +1,6 @@
 package com.example.habittracker.controller;
 
+import com.example.habittracker.dto.request.LoginRequest;
 import com.example.habittracker.dto.request.RegisterRequest;
 import com.example.habittracker.dto.response.AuthResponse;
 import com.example.habittracker.service.AuthService;
@@ -19,5 +20,10 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
+        return authService.login(request);
     }
 }
