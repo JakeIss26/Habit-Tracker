@@ -41,6 +41,11 @@ public class GlobalExceptionHandler {
 
         return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
+    @ExceptionHandler(HabitAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleHabitAccessDenied(HabitAccessDeniedException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message) {
         ErrorResponse response = new ErrorResponse(

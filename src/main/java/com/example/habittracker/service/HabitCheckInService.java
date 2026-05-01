@@ -1,11 +1,9 @@
 package com.example.habittracker.service;
 
 import com.example.habittracker.dto.response.HabitCheckInResponse;
+import com.example.habittracker.entity.Habit;
 import com.example.habittracker.entity.HabitCheckIn;
-import com.example.habittracker.exception.CheckInNotFoundException;
-import com.example.habittracker.exception.CheckInOwnershipException;
-import com.example.habittracker.exception.HabitAlreadyCheckedInException;
-import com.example.habittracker.exception.HabitNotFoundException;
+import com.example.habittracker.exception.*;
 import com.example.habittracker.repository.HabitCheckInRepository;
 import com.example.habittracker.repository.HabitRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +18,16 @@ public class HabitCheckInService {
 
     private final HabitCheckInRepository habitCheckInRepository;
     private final HabitRepository habitRepository;
+    private final UserService userService;
 
     public HabitCheckInResponse createCheckIn(Long habitId) {
-        if (!habitRepository.existsById(habitId)) {
-            throw new HabitNotFoundException(habitId);
+        Long currentUserId = userService.getCurrentUserId();
+
+        Habit habit = habitRepository.findById(habitId)
+        .orElseThrow(() -> new HabitNotFoundException(habitId));
+
+        if (!habit.getUserId().equals(currentUserId)) {
+            throw new HabitAccessDeniedException(habitId);
         }
 
         LocalDate today = LocalDate.now();
@@ -45,8 +49,13 @@ public class HabitCheckInService {
     }
 
     public List<HabitCheckInResponse> getCheckInsByHabitId(Long habitId) {
-        if (!habitRepository.existsById(habitId)) {
-            throw new HabitNotFoundException(habitId);
+        Long currentUserId = userService.getCurrentUserId();
+
+        Habit habit = habitRepository.findById(habitId)
+        .orElseThrow(() -> new HabitNotFoundException(habitId));
+
+        if (!habit.getUserId().equals(currentUserId)) {
+            throw new HabitAccessDeniedException(habitId);
         }
 
         return habitCheckInRepository.findByHabitIdOrderByCheckInDateDesc(habitId)
@@ -54,7 +63,17 @@ public class HabitCheckInService {
         .map(this::toResponse)
         .toList();
     }
+
     public void deleteCheckIn(Long habitId, Long checkInId) {
+        Long currentUserId = userService.getCurrentUserId();
+
+        Habit habit = habitRepository.findById(habitId)
+        .orElseThrow(() -> new HabitNotFoundException(habitId));
+
+        if (!habit.getUserId().equals(currentUserId)) {
+            throw new HabitAccessDeniedException(habitId);
+        }
+
         HabitCheckIn checkIn = habitCheckInRepository.findById(checkInId)
         .orElseThrow(() -> new CheckInNotFoundException(checkInId));
 
