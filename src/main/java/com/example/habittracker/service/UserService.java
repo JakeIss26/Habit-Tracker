@@ -1,5 +1,6 @@
 package com.example.habittracker.service;
 
+import com.example.habittracker.dto.response.UserResponse;
 import com.example.habittracker.entity.User;
 import com.example.habittracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,15 @@ public class UserService {
 
     public Long getCurrentUserId() {
         return getCurrentUser().getId();
+    }
+
+    public UserResponse getCurrentUserResponse() {
+        User user = getCurrentUser();
+
+        return new UserResponse(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail()
+        );
     }
 }
