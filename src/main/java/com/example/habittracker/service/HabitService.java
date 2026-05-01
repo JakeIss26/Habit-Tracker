@@ -4,6 +4,7 @@ import com.example.habittracker.dto.request.HabitCreateRequest;
 import com.example.habittracker.dto.request.HabitUpdateRequest;
 import com.example.habittracker.dto.response.HabitResponse;
 import com.example.habittracker.dto.response.HabitStatsResponse;
+import com.example.habittracker.dto.response.HabitSummaryResponse;
 import com.example.habittracker.entity.Habit;
 import com.example.habittracker.entity.HabitCheckIn;
 import com.example.habittracker.exception.HabitNotFoundException;
@@ -80,12 +81,42 @@ public class HabitService {
         habitRepository.save(habit);
     }
 
+    public List<HabitResponse> getArchivedHabits() {
+        Long currentUserId = currentUserService.getCurrentUserId();
+
+        return habitRepository.findByUserIdAndArchivedTrueOrderByCreatedAtDesc(currentUserId)
+        .stream()
+        .map(this::toResponse)
+        .toList();
+    }
+
+    public HabitResponse restoreHabit(Long id) {
+        Long currentUserId = currentUserService.getCurrentUserId();
+
+        Habit habit = habitRepository.findByIdAndUserId(id, currentUserId)
+        .orElseThrow(() -> new HabitNotFoundException(id));
+
+        habit.setArchived(false);
+
+        Habit restoredHabit = habitRepository.save(habit);
+
+        return toResponse(restoredHabit);
+    }
+
+    public List<HabitSummaryResponse> getHabitSummaries() {
+        Long currentUserId = currentUserService.getCurrentUserId();
+
+        return habitRepository.findByUserIdAndArchivedFalseOrderByCreatedAtDesc(currentUserId)
+        .stream()
+        .map(this::toSummaryResponse)
+        .toList();
+    }
+
     public HabitStatsResponse getHabitStats(Long habitId) {
         Long currentUserId = currentUserService.getCurrentUserId();
 
         habitRepository.findByIdAndUserId(habitId, currentUserId)
         .orElseThrow(() -> new HabitNotFoundException(habitId));
-
 
         long totalCheckIns = habitCheckInRepository.countByHabitId(habitId);
 
@@ -105,13 +136,16 @@ public class HabitService {
         double completionRateLast7Days = completedDaysLast7Days * 100.0 / 7;
         completionRateLast7Days = roundToTwoDecimals(completionRateLast7Days);
 
+        boolean completedToday = habitCheckInRepository.existsByHabitIdAndCheckInDate(habitId, today);
+
         return new HabitStatsResponse(
             habitId,
             totalCheckIns,
             currentStreak,
             longestStreak,
             completedDaysLast7Days,
-            completionRateLast7Days
+            completionRateLast7Days,
+            completedToday
         );
     }
 
@@ -176,6 +210,40 @@ public class HabitService {
         habit.getDescription(),
         habit.isArchived(),
         habit.getCreatedAt()
+        );
+    }
+
+    private HabitSummaryResponse toSummaryResponse(Habit habit) {
+        Long habitId = habit.getId();
+
+        LocalDate today = LocalDate.now();
+        LocalDate sevenDaysAgo = today.minusDays(6);
+
+        boolean completedToday = habitCheckInRepository.existsByHabitIdAndCheckInDate(habitId, today);
+
+        int currentStreak = calculateCurrentStreak(habitId);
+
+        int longestStreak = calculateLongestStreak(habitId);
+
+        long completedDaysLast7Days = habitCheckInRepository.countByHabitIdAndCheckInDateBetween(
+        habitId,
+        sevenDaysAgo,
+        today
+        );
+
+        double completionRateLast7Days = completedDaysLast7Days * 100.0 / 7;
+        completionRateLast7Days = roundToTwoDecimals(completionRateLast7Days);
+
+        return new HabitSummaryResponse(
+            habit.getId(),
+            habit.getTitle(),
+            habit.getDescription(),
+            habit.getCreatedAt(),
+            completedToday,
+            currentStreak,
+            longestStreak,
+            completedDaysLast7Days,
+            completionRateLast7Days
         );
     }
 }

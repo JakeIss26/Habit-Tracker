@@ -3,13 +3,21 @@ package com.example.habittracker.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
-public class HabitStatsResponse {
+public class HabitSummaryResponse {
 
-    private Long habitId;
+    private Long id;
 
-    private long totalCheckIns;
+    private String title;
+
+    private String description;
+
+    private LocalDateTime createdAt;
+
+    private boolean completedToday;
 
     private int currentStreak;
 
@@ -18,6 +26,4 @@ public class HabitStatsResponse {
     private long completedDaysLast7Days;
 
     private double completionRateLast7Days;
-
-    private boolean completedToday;
 }

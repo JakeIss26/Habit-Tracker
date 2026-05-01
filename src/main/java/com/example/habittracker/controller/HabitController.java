@@ -4,6 +4,7 @@ import com.example.habittracker.dto.request.HabitCreateRequest;
 import com.example.habittracker.dto.request.HabitUpdateRequest;
 import com.example.habittracker.dto.response.HabitResponse;
 import com.example.habittracker.dto.response.HabitStatsResponse;
+import com.example.habittracker.dto.response.HabitSummaryResponse;
 import com.example.habittracker.service.HabitService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +31,6 @@ public class HabitController {
         return habitService.getActiveHabits();
     }
 
-    @GetMapping("/{id}")
-    public HabitResponse getHabitById(@PathVariable Long id) {
-        return habitService.getHabitById(id);
-    }
-
     @PutMapping("/{id}")
     public HabitResponse updateHabit(@PathVariable Long id, @Valid @RequestBody HabitUpdateRequest request) {
         return habitService.updateHabit(id, request);
@@ -50,4 +46,24 @@ public class HabitController {
     public HabitStatsResponse getHabitStats(@PathVariable Long id) {
         return habitService.getHabitStats(id);
     }
+    @GetMapping("/summary")
+    public List<HabitSummaryResponse> getHabitSummaries() {
+        return habitService.getHabitSummaries();
+    }
+
+    @GetMapping("/archived")
+    public List<HabitResponse> getArchivedHabits() {
+        return habitService.getArchivedHabits();
+    }
+
+    @PatchMapping("/{id}/restore")
+    public HabitResponse restoreHabit(@PathVariable Long id) {
+        return habitService.restoreHabit(id);
+    }
+
+    @GetMapping("/{id}")
+    public HabitResponse getHabitById(@PathVariable Long id) {
+        return habitService.getHabitById(id);
+    }
+
 }

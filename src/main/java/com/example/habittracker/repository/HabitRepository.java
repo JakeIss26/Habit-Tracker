@@ -9,5 +9,8 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
 
     List<Habit> findByUserIdAndArchivedFalseOrderByCreatedAtDesc(Long userId);
 
+    List<Habit> findByUserIdAndArchivedTrueOrderByCreatedAtDesc(Long userId);
+
     Optional<Habit> findByIdAndUserId(Long id, Long userId);
+
 }
